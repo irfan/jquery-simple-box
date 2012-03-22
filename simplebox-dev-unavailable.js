@@ -5,6 +5,7 @@
 		win = $(window),
 		dn = 'simplebox',	// element data name
 		overlay,
+		loading,
 		sbContent,
 		container,
 		sbControls,
@@ -14,10 +15,14 @@
 		groups = [],
 		isDataReady = false,
 		interval,
-		inAction = false;
+		inAction = false,
+		callback;
 				
 	// start the plugin main method
-	$.fn.simplebox = function(settings){
+	$.fn.simplebox = function(settings, toback){
+		if (toback) {
+			callback = toback;
+		};
 		win.bind('init.sb', actions.init);
 		
 		// for each element
@@ -29,6 +34,7 @@
 			el.bind(opts.event, function(e){
 				e.preventDefault();
 				$(this).trigger('start.sb');
+				//loading.bind('start.sb', actions.loading);
 			});
 			
 			el.bind('start.sb', actions.start)
@@ -64,13 +70,15 @@
 	// set
 	var actions = {
 		init: function(e){
+			//callback(e);
 			//console.log('init: +');
-			$('body').append('<div id="sbOverlay" /> <div id="sbContainer"> <div id="sbControls"><a href="#prev" id="sbPrevButton">[<-] Prev</a> <a href="#close" id="sbCloseButton">[X] Close</a><a href="#next" id="sbNextButton">[->] Next</a></div><div id="sbContent" /></div>');
+			$('body').append('<div id="sbOverlay" /> <div id="sbContainer"><div id="sbContent" /><div id="sbControls"><a href="#close" id="sbCloseButton">Kapat</a><a href="#next" id="sbNextButton">Sonraki</a><a href="#prev" id="sbPrevButton">Önceki</a></div></div><div id="sbLoading">Yükleniyor...</div>');
 			
 			overlay = $('#sbOverlay'),
 			sbContent = $('#sbContent'),
 			container = $('#sbContainer'),
-			sbControls = $('#sbControls');
+			sbControls = $('#sbControls'),
+			loading = $('#sbLoading');
 			
 			inited = true;
 			//console.log('init: -');
@@ -133,6 +141,7 @@
 			//console.log('setImage: -');
 		},
 		show: function(e){
+			//callback(e);
 			//console.log('show: +');
 			
 			if (!isDataReady) {
@@ -154,9 +163,7 @@
 			
 			if (opts.overlay) {
 				if (opts.effect === 'fade') {
-					overlay.fadeIn(opts.duration, function(){
-						container.fadeIn(opts.duration);
-					});
+					container.fadeIn(opts.duration);
 				}
 				else{
 					overlay.show();
@@ -178,15 +185,18 @@
 				});
 			}
 			
+			
+			//console.log(opts.showControls)
 			// bind close 
-			if (opts.showControls) {
+			//if (opts.showControls) {
 				var cs = $(opts.closeSelector);
+				//console.log(cs)
 				cs.die();
 				cs.live(opts.closeEvent, function(e){
 					e.preventDefault();
 					el.trigger('close.sb');
 				});
-			};
+			//};
 			if (opts.type == 'gallery') {
 				var ns = $(opts.nextSelector),
 					ps = $(opts.prevSelector);
@@ -241,7 +251,7 @@
 			return;
 		},
 		start: function(e){
-			//console.log('start: +');
+			actions.loading(e);
 			if (inAction) {
 				return;
 			};
@@ -258,11 +268,8 @@
 			container.css({
 				width: opts.width,
 				height: opts.height,
-				padding: opts.padding
-			});
-			overlay.css({
-				'background-color' : opts.color,
-				'opacity': opts.opacity,
+				padding: opts.padding,
+				'background-color': opts.bg
 			});
 			
 			// content came from other element or ajax ???
@@ -270,11 +277,27 @@
 				var cont = $(content);
 				
 				if (cont.length > 0) {
-					sbContent.html(cont.html());
+					//console.log(e, cont)
+					actions.fillContent(e, cont.html());
 				}
 				else {
+					//console.log('error')
 					actions.setError(e);
 				}
+			}
+			else if(content.substring(0,1) === '/'){
+			    isDataReady = true;
+    			inAction = false;
+			    $.ajax({
+			        url: content,
+			        type: opts.ajaxMethod,
+			        success: function(data){
+			            //console.log(data.success)
+			            if (data.success) {
+			                actions.fillContent(e, data.html);
+			            }
+			        }
+			    })
 			}
 			else{
 				actions.getImage(e, content);
@@ -285,6 +308,15 @@
 			});
 			//console.log('start: -');
 			return this;
+		},
+		fillContent: function(e, content){
+		    
+			sbContent.html(content);
+			actions.repos();
+			actions.show(e);
+			
+			isDataReady = true;
+			inAction = false;
 		},
 		getImage: function (e, content) {
 			//console.log('getImage: +');
@@ -345,9 +377,6 @@
 				var tp = (win.height() / 2) - (container.height() / 2),
 					lp = (win.width() / 2) - (container.width() / 2);
 			}
-				
-			
-			overlay.css('height', doc.height());
 			
 			if (win.scrollTop() > 0) {
 				tp = tp + win.scrollTop();
@@ -362,11 +391,21 @@
 				top : tp
 			});
 			
+			llp = (lp + (container.width() / 2)) - (loading.width() / 2);
+			ltp = (tp + (container.height() / 2))- (loading.height() / 2);
+			
+			//console.log(container.width(), loading.width());
+			
+			loading.css({
+				left:llp,
+				top:ltp
+			});
+			
 			//console.log('repos: -');
 			return this;
 		},
 		changeImage: function(e){
-			
+			//console.log('changeimage..')
 			actions.loading(e);
 			
 			var el = $(e.target),
@@ -381,16 +420,7 @@
 				$(groups[opts.galleryName][id]).click();
 				el.trigger('destroy.sb');
 			})
-			
-			
-				
-			/*console.log(e);
-			console.log(opts);
-			console.log(groups, groups[opts.galleryName], groups[opts.galleryName].length);
-						
-			console.log(el);
-			console.log('galeri sira no: ', opts.galleryId);
-			*/
+
 			isOpen = false;
 			isDataReady = false;
 			inAction = false;
@@ -398,41 +428,77 @@
 			
 		},
 		loading: function(e){
-			return;
+			//console.log(inAction);
+			
+			if (inAction) {
+				loading.show();
+			}
+			else{
+				loading.hide();
+			}
+		    
+		    
+			if (!overlay.is(':visible')) {
+				
+				var el = $(e.target),
+					opts = el.data(dn);
+
+				overlay.css({
+					'background-color' : opts.color,
+					'opacity': opts.opacity,
+				});
+
+				overlay.css('height', doc.height());
+
+
+				if (opts.overlay) {
+					if (opts.effect == 'fade') {
+						overlay.fadeIn(opts.duration);
+					}
+					else{
+						overlay.fadeIn(opts.duration);
+					}
+				};
+
+				return;
+			};
+			
 		}
 	},
 	
 	defaults = {
-		'event' : 'click',
+		event : 'click',
 		
-		'showControls' : true,
+		showControls : true,
 		
-		'closeEvent' : 'click',
-		'closeSelector' : '#sbCloseButton',
+		ajaxMethod : 'GET',
+
+		closeEvent : 'click',
+		closeSelector : '#sbCloseButton',
 		
-		'nextEvent' : 'click',
-		'nextSelector' : '#sbNextButton',
+		nextEvent : 'click',
+		nextSelector : '#sbNextButton',
 		
-		'prevEvent' : 'click',
-		'prevSelector' : '#sbPrevButton',
+		prevEvent : 'click',
+		prevSelector : '#sbPrevButton',
 		
-		'effect': 'fade',
-		'duration' : 150,
+		effect: 'fade',
+		duration : 150,
 		
-		'width' : 485,
-		'height' : 300,
-		'padding' : 10,
+		width : 485,
+		height : 300,
+		padding : 10,
+		bg:'#FFF',
 		
-		'overlay' : true,
-		'color' : '#000',
-		'opacity' : 0.7,
-		'overlayClose' : true,
+		overlay : true,
+		color : '#000',
+		opacity : 0.7,
+		overlayClose : true,
 		
-		'type' : 'single',
-		'galleryName' : false,
+		type : 'single',
+		galleryName : false,
 		
-		'debug' : false
+		debug : false
 	};
 })(jQuery)
-
 
