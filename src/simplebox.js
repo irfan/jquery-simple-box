@@ -190,17 +190,14 @@
 			}
 			
 			
-			//console.log(options.showControls)
-			// bind close 
-			//if (options.showControls) {
-				var cs = $(options.closeSelector);
-				//console.log(cs)
-				cs.die();
-				cs.live(options.closeEvent, function(e){
+			if (options.showControls) {
+				var close = $(options.closeSelector);
+				close.die();
+				close.live(options.closeEvent, function(e){
 					e.preventDefault();
 					el.trigger('close.sb');
 				});
-			//};
+			};
 		    
             var next = $(options.nextSelector),
 				prev = $(options.prevSelector);
@@ -274,7 +271,6 @@
 			container.css({
 				width: options.width,
 				height: options.height,
-				padding: options.padding,
 				'background-color': options.bg
 			});
 			
@@ -493,7 +489,6 @@
 		
 		width : 485,
 		height : 300,
-		padding : 10,
 		bg:'#FFF',
 		
 		overlay : true,
