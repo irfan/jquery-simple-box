@@ -19,14 +19,13 @@
 		callback;
 				
 	// start the plugin main method
-	$.fn.simplebox = function(settings, toback){
-		if (toback) {
-			callback = toback;
-		};
+	$.fn.simplebox = function(settings, callback){
+        
+        callback = callback || function(){};
 		win.bind('init.sb', actions.init);
 		
 		// for each element
-		$(this).each(function(index, value){
+		this.each(function(index, value){
 			
 			var el = $(this),
 				opts = $.extend(true, {}, defaults, settings);
