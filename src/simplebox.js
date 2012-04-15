@@ -201,45 +201,47 @@
 					el.trigger('close.sb');
 				});
 			//};
+		    
+            var next = $(options.nextSelector),
+				prev = $(options.prevSelector);
+
 			if (options.type == 'gallery') {
-				var ns = $(options.nextSelector),
-					ps = $(options.prevSelector);
 				
-				ns.die(options.nextEvent);
-				ps.die(options.nextEvent);
+				next.die(options.nextEvent);
+				prev.die(options.nextEvent);
 				
 				// bind next 
-				ns.live(options.nextEvent, function(e){
+				next.live(options.nextEvent, function(e){
 					e.preventDefault();
 					el.trigger('next.sb');
 				}).show();
 				
 				// bind prev
-				ps.live(opitons.prevEvent, function(e){
+				prev.live(opitons.prevEvent, function(e){
 					e.preventDefault();
 					el.trigger('prev.sb');
 				}).show();
 				
 				if (groups[options.galleryName].length == options.galleryId) {
-					ns.die(options.nextEvent)
+					next.die(options.nextEvent)
 					  .hide();
 				};
 				
 				if (options.galleryId == 1) {
-					ps.die(options.nextEvent)
+					prev.die(options.nextEvent)
 					  .hide();
 				};
 				if (groups[options.galleryName].length == 1) {
-					ns.die(options.nextEvent)
-					  .hide();
-					ps.die(options.nextEvent)
-					  .hide();
+					next.die(options.nextEvent)
+					    .hide();
+					prev.die(options.nextEvent)
+					    .hide();
 				};
 				
 			}
 			else{
-				$(options.prevSelector).die(options.prevEvent).hide();
-				$(options.nextSelector).die(options.nextEvent).hide();
+				prev.die(options.prevEvent).hide();
+				next.die(options.nextEvent).hide();
 			}
 			
 			if (!options.showControls) {
