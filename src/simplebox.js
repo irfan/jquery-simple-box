@@ -202,7 +202,7 @@
             var next = $(options.nextSelector),
 				prev = $(options.prevSelector);
 
-			if (options.type == 'gallery') {
+			if (options.type == 'gallery' && groups[options.galleryName].length > 1) {
 				
 				next.die(options.nextEvent);
 				prev.die(options.nextEvent);
@@ -227,12 +227,6 @@
 				if (options.galleryId == 1) {
 					prev.die(options.nextEvent)
 					  .hide();
-				};
-				if (groups[options.galleryName].length == 1) {
-					next.die(options.nextEvent)
-					    .hide();
-					prev.die(options.nextEvent)
-					    .hide();
 				};
 				
 			}
