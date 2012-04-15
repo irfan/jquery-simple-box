@@ -214,7 +214,7 @@
 				}).show();
 				
 				// bind prev
-				prev.live(opitons.prevEvent, function(e){
+				prev.live(options.prevEvent, function(e){
 					e.preventDefault();
 					el.trigger('prev.sb');
 				}).show();
