@@ -22,7 +22,7 @@
 	$.fn.simplebox = function(settings, callback){
         
         callback = callback || function(){};
-		win.bind('init.sb', actions.init);
+        settings = settings || {};
 		
 		// for each element
 		this.each(function(index, value){
@@ -30,7 +30,9 @@
 			var el = $(this),
 				options = $.extend(true, {}, defaults, settings);
 			
-			el.bind(options.event, function(e){
+		    el.bind('init.sb', actions.init);
+			
+            el.bind(options.event, function(e){
 				e.preventDefault();
 				$(this).trigger('start.sb');
 				//loading.bind('start.sb', actions.loading);
@@ -56,12 +58,13 @@
 			};
 			
 			el.data(dn, options);
+
+            if (!inited) {
+                el.trigger('init.sb');
+            };
 			
 		}); // each
 		
-		if (!inited) {
-			win.trigger('init.sb');
-		};
 		
 		return this;
 	} // $.fn.simplebox
@@ -69,9 +72,11 @@
 	// set
 	var actions = {
 		init: function(e){
-			//callback(e);
-			//console.log('init: +');
-			$('body').append('<div id="sbOverlay" /> <div id="sbContainer"><div id="sbContent" /><div id="sbControls"><a href="#close" id="sbCloseButton">Kapat</a><a href="#next" id="sbNextButton">Sonraki</a><a href="#prev" id="sbPrevButton">Önceki</a></div></div><div id="sbLoading">Yükleniyor...</div>');
+            console.log(e);
+			var options = $(e.target).data('simplebox'),
+			    lang = options[options.lang];
+			
+            $('body').append('<div id="sbOverlay" /> <div id="sbContainer"><div id="sbContent" /><div id="sbControls"><a href="#close" id="sbCloseButton">' + lang.close + '</a><a href="#next" id="sbNextButton">' + lang.next + '</a><a href="#prev" id="sbPrevButton">' + lang.prev + '</a></div></div><div id="sbLoading">' + lang.loading + '.</div>');
 			
 			overlay = $('#sbOverlay'),
 			sbContent = $('#sbContent'),
@@ -84,9 +89,11 @@
 			return this;
 		},
 		setError: function(e){
+			var options = $(e.target).data('simplebox'),
+			    lang = options[options.lang];
 			//console.log('setError: +');
 			// if content doesn't found set auto width and height
-			sbContent.html('This content is not available right now');
+			sbContent.html(lang.contentError);
 			actions.autoSize(e);
 			isDataReady = false;
 			//console.log('setError: -');
@@ -497,7 +504,31 @@
 		type : 'single',
 		galleryName : false,
 		
+        lang: 'tr',
+        tr: {
+            close: 'Kapat',
+            next: 'Sonraki',
+            prev: 'Önceki',
+            loading:'Yükleniyor...',
+            contentError: 'İstediğiniz içeriğe şu anda ulaşılamıyor.'
+        },
+        en:{
+            close: 'Close',
+            next: 'Next',
+            prev: 'Prev',
+            loading: 'Loading...',
+            contentError: 'This content is not available at this moment'
+        },
+        de: {
+            close: 'Schließen',
+            next: 'Nächste',
+            prev: 'Zurück',
+            loading: 'Laden...',
+            contentError: 'Dieser inhalt ist nicht verfügbar immMomen'
+        },
 		debug : false
 	};
 })(jQuery)
+
+
 
