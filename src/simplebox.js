@@ -1,8 +1,7 @@
 (function($){
 	
 	// define global variables
-	var doc = $(document),
-		win = $(window),
+	var win = $(window),
 		dn = 'simplebox',	// element data name
 		overlay,
 		loading,
@@ -72,7 +71,6 @@
 	// set
 	var actions = {
 		init: function(e){
-            console.log(e);
 			var options = $(e.target).data('simplebox'),
 			    lang = options[options.lang];
 			
@@ -454,7 +452,7 @@
 					'opacity': options.opacity,
 				});
 
-				overlay.css('height', doc.height());
+				overlay.css('height', $(document).height());
 
 
 				if (options.overlay) {
