@@ -28,9 +28,9 @@
 		this.each(function(index, value){
 			
 			var el = $(this),
-				opts = $.extend(true, {}, defaults, settings);
+				options = $.extend(true, {}, defaults, settings);
 			
-			el.bind(opts.event, function(e){
+			el.bind(options.event, function(e){
 				e.preventDefault();
 				$(this).trigger('start.sb');
 				//loading.bind('start.sb', actions.loading);
@@ -40,22 +40,22 @@
 			  .bind('close.sb', actions.close)
 			  .bind('destroy.sb', actions.destroy);
 			
-			if (opts.type == 'gallery') {
+			if (options.type == 'gallery') {
 				
 				// create empty array in groups global variable
-				if (!groups[opts.galleryName]) {
-					groups[opts.galleryName] = new Array();
+				if (!groups[options.galleryName]) {
+					groups[options.galleryName] = new Array();
 				};
 				
 				// push item to array
-				groups[opts.galleryName].push(el);
+				groups[options.galleryName].push(el);
 				
-				opts.galleryId = groups[opts.galleryName].length;
+				options.galleryId = groups[options.galleryName].length;
 				
 				el.bind('next.sb prev.sb', actions.changeImage);
 			};
 			
-			el.data(dn, opts);
+			el.data(dn, options);
 			
 		}); // each
 		
@@ -121,7 +121,7 @@
 		setImage: function(e, image){
 			//console.log('setImage: +');
 			var el = $(e.target),
-				opts = el.data(dn);
+				options = el.data(dn);
 			
 			if (image.width > win.width()) {
 				image.width = win.width() * 0.8;
@@ -158,11 +158,11 @@
 			}
 			
 			var el = $(e.target),
-				opts = el.data(dn);
+				options = el.data(dn);
 			
-			if (opts.overlay) {
-				if (opts.effect === 'fade') {
-					container.fadeIn(opts.duration);
+			if (options.overlay) {
+				if (options.effect === 'fade') {
+					container.fadeIn(options.duration);
 				}
 				else{
 					overlay.show();
@@ -170,74 +170,74 @@
 				}
 			}
 			else{
-				container.fadeIn(opts.duration);
+				container.fadeIn(options.duration);
 			}
 			
 			// click to overlay close is need ?
 			
-			overlay.unbind(opts.closeEvent);
+			overlay.unbind(options.closeEvent);
 			
-			if (opts.overlayClose) {
-				overlay.bind(opts.closeEvent, function(e){
+			if (options.overlayClose) {
+				overlay.bind(options.closeEvent, function(e){
 					e.preventDefault();
 					el.trigger('close.sb', e);
 				});
 			}
 			
 			
-			//console.log(opts.showControls)
+			//console.log(options.showControls)
 			// bind close 
-			//if (opts.showControls) {
-				var cs = $(opts.closeSelector);
+			//if (options.showControls) {
+				var cs = $(options.closeSelector);
 				//console.log(cs)
 				cs.die();
-				cs.live(opts.closeEvent, function(e){
+				cs.live(options.closeEvent, function(e){
 					e.preventDefault();
 					el.trigger('close.sb');
 				});
 			//};
-			if (opts.type == 'gallery') {
-				var ns = $(opts.nextSelector),
-					ps = $(opts.prevSelector);
+			if (options.type == 'gallery') {
+				var ns = $(options.nextSelector),
+					ps = $(options.prevSelector);
 				
-				ns.die(opts.nextEvent);
-				ps.die(opts.nextEvent);
+				ns.die(options.nextEvent);
+				ps.die(options.nextEvent);
 				
 				// bind next 
-				ns.live(opts.nextEvent, function(e){
+				ns.live(options.nextEvent, function(e){
 					e.preventDefault();
 					el.trigger('next.sb');
 				}).show();
 				
 				// bind prev
-				ps.live(opts.prevEvent, function(e){
+				ps.live(opitons.prevEvent, function(e){
 					e.preventDefault();
 					el.trigger('prev.sb');
 				}).show();
 				
-				if (groups[opts.galleryName].length == opts.galleryId) {
-					ns.die(opts.nextEvent)
+				if (groups[options.galleryName].length == options.galleryId) {
+					ns.die(options.nextEvent)
 					  .hide();
 				};
 				
-				if (opts.galleryId == 1) {
-					ps.die(opts.nextEvent)
+				if (options.galleryId == 1) {
+					ps.die(options.nextEvent)
 					  .hide();
 				};
-				if (groups[opts.galleryName].length == 1) {
-					ns.die(opts.nextEvent)
+				if (groups[options.galleryName].length == 1) {
+					ns.die(options.nextEvent)
 					  .hide();
-					ps.die(opts.nextEvent)
+					ps.die(options.nextEvent)
 					  .hide();
 				};
 				
 			}
 			else{
-				$(opts.prevSelector).die(opts.prevEvent).hide();
-				$(opts.nextSelector).die(opts.nextEvent).hide();
+				$(options.prevSelector).die(options.prevEvent).hide();
+				$(options.nextSelector).die(options.nextEvent).hide();
 			}
 			
-			if (!opts.showControls) {
+			if (!options.showControls) {
 				sbControls.hide();
 			}
 			else{
@@ -258,17 +258,17 @@
 			inAction = true;
 			
 			var el = $(e.target),
-				opts = el.data(dn),
+				options = el.data(dn),
 				content = el.attr('href');
 			
 			// set last opened item to global variable
 			openedItem = el;
 			
 			container.css({
-				width: opts.width,
-				height: opts.height,
-				padding: opts.padding,
-				'background-color': opts.bg
+				width: options.width,
+				height: options.height,
+				padding: options.padding,
+				'background-color': options.bg
 			});
 			
 			// content came from other element or ajax ???
@@ -289,7 +289,7 @@
     			inAction = false;
 			    $.ajax({
 			        url: content,
-			        type: opts.ajaxMethod,
+			        type: options.ajaxMethod,
 			        success: function(data){
 			            //console.log(data.success)
 			            if (data.success) {
@@ -366,11 +366,11 @@
 		repos: function(e){
 			//console.log('repos: +');
 			
-			var opts = openedItem.data(dn);
+			var options = openedItem.data(dn);
 			
-			if (typeof(opts.height) == 'number') {
-				var tp = (win.height() / 2) - (opts.height / 2),
-					lp = (win.width() / 2) - (opts.width / 2);
+			if (typeof(options.height) == 'number') {
+				var tp = (win.height() / 2) - (options.height / 2),
+					lp = (win.width() / 2) - (options.width / 2);
 			}
 			else{
 				var tp = (win.height() / 2) - (container.height() / 2),
@@ -408,15 +408,15 @@
 			actions.loading(e);
 			
 			var el = $(e.target),
-				opts = el.data(dn),
-				id = opts.galleryId;
+				options = el.data(dn),
+				id = options.galleryId;
 			
 			if (e.type == 'prev') {
-				id = opts.galleryId - 2;
+				id = options.galleryId - 2;
 			};
 			
 			container.fadeOut(function(){
-				$(groups[opts.galleryName][id]).click();
+				$(groups[options.galleryName][id]).click();
 				el.trigger('destroy.sb');
 			})
 
@@ -440,22 +440,22 @@
 			if (!overlay.is(':visible')) {
 				
 				var el = $(e.target),
-					opts = el.data(dn);
+					options = el.data(dn);
 
 				overlay.css({
-					'background-color' : opts.color,
-					'opacity': opts.opacity,
+					'background-color' : options.color,
+					'opacity': options.opacity,
 				});
 
 				overlay.css('height', doc.height());
 
 
-				if (opts.overlay) {
-					if (opts.effect == 'fade') {
-						overlay.fadeIn(opts.duration);
+				if (options.overlay) {
+					if (options.effect == 'fade') {
+						overlay.fadeIn(options.duration);
 					}
 					else{
-						overlay.fadeIn(opts.duration);
+						overlay.fadeIn(options.duration);
 					}
 				};
 
